@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block applicationactive %}active
+{% endblock applicationactive %}
+{% block title %} Application
+{% endblock title %}
+
+{% block body %}
+
+<div class="container my-3 w-50">
+    <h2>Applications</h2>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {{new}}" href="/applications/new">New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{checked}}" href="/applications/checked">Checked</a>
+        </li>
+    </ul>
+    <table class="table table-striped ">
+        <thead>
+          <tr>
+            <th scope="col">S.no</th>
+            <th scope="col">Name</th>
+            <th scope="col">age</th>
+            <th scope="col">sex</th>
+            <th scope="col">LabNo</th>
+            <th scope="col">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+         {% for application in applications %}
+              
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{application.name}}</td>
+            <td>{{application.age}}</td>
+            <td>{{application.sex}}</td>
+            <td>{{application.lab_no}}</td>
+            <td>&#8377;{{application.cost}}</td>
+            {% if not application.checked %}
+              <td><a class="btn btn-primary" href="/check/{{application.lab_no}}">Check</a></td>
+            {% else %}
+              <td><a class="btn btn-primary" href="/viewPage/{{application.lab_no}}">View</a></td>
+
+            {% endif %}
+            
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+
+</div>
+
+{% endblock body %}

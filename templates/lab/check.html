@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}
+{{application.name}}-({{application.lab_no}})
+{% endblock title %}
+
+{% block body %}
+
+<div class="container w-50 my-3">
+    <h2 class="text-center bg-primary text-light">Shriya Diagnostics</h2>
+    <div id = "alertme">
+
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <table class="font-weight-bold" style="font-size:18px;">
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>:</td>
+                        <td>{{application.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Age</td>
+                        <td>:</td>
+                        <td>{{application.age}} yrs</td>
+                    </tr>
+                    <tr>
+                        <td>Sex</td>
+                        <td>:</td>
+                        <td>{{application.sex}}</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6" >
+            <table class="font-weight-bold" style="font-size:18px;">
+                <tbody>
+                    <tr>
+                        <td>Received_on</td>
+                        <td>:</td>
+                        <td>{{application.recieved_on}}</td>
+                    </tr>
+                    <tr>
+                        <td>Lab_No</td>
+                        <td>:</td>
+                        <td>{{application.lab_no}}</td>
+                    </tr>
+                    <tr>
+                        <td>Ref.By</td>
+                        <td>:</td>
+                        <td>{{application.ref_by}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <table class="table my-3">
+        <thead>
+          <tr>
+            <th scope="col">Test</th>
+            <th scope="col">Finding Values</th>
+            <th scope="col">Ref . Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td>{{record.test}}</td>
+              <td id="fi{{forloop.counter}}"><input type="text" class="form-control" id="finding{{forloop.counter}}" placeholder="Finding" value='{{record.finding}}'></td>
+              <td id="ri{{forloop.counter}}"><input type="text" class="form-control" id="range{{forloop.counter}}" placeholder="Range" value='{{record.ref}}'></td>
+              <td id='b{{forloop.counter}}'><button class="btn btn-primary" onclick="push('{{forloop.counter}}','{{record.test}}')">Push</button></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn btn-primary" onclick = "submit('{{application.lab_no}}','{{length}}')">Submit</button>
+</div>
+
+{% endblock body %}
+
+{% block js %}
+    <script>
+        function push(x,test){
+            finding = document.getElementById('finding'+x).value
+            range = document.getElementById('range'+x).value
+            if(finding != "" && range != ""){
+                $.ajax({
+                    type:'GET',
+                    url:'/registerValues',
+                    data:{
+                        'lab_no':'{{application.lab_no}}',
+                        'test':test,
+                        'finding':finding,
+                        'ref':range,
+                    },
+                    success:function(response){
+                        document.getElementById('fi'+x).innerHTML = finding
+                        document.getElementById('ri'+x).innerHTML = range
+                        document.getElementById('b'+x).innerHTML = ""
+                    }
+                });
+            }else{
+                var alert = document.getElementById("alertme");
+                alert.innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Sorry!</strong>You left a block empty' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+              '  <span aria-hidden="true">&times;</span>' +
+              '</button> </div>';
+            }
+        }
+        function submit(lab_no,length){
+            var count = 0;
+            for(i=1;i<=length;i++){
+                if(document.getElementById('b'+i).innerHTML != ""){
+                    count++;
+                    break;
+                }
+            }
+            if(count == 0){
+                window.location.href = "/submitCheck/"+lab_no
+            }else{
+                var alert = document.getElementById("alertme");
+                alert.innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Sorry!</strong>You didn\'t push some blocks' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+              '  <span aria-hidden="true">&times;</span>' +
+              '</button> </div>';
+            }
+        }
+    </script>
+{% endblock js %}

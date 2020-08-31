@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}
+{{application.name}}-({{application.lab_no}})
+{% endblock title %}
+{% block css %}
+<style>
+  @media print {
+      body * {
+          visibility:hidden,
+      }
+      #content {
+          visibility:visible,
+      }
+  }
+  </style>
+{% endblock css %}
+{% block body %}
+
+<div class="container w-50 my-3">
+    <h2 class="text-center bg-primary text-light">Shriya Diagnostics</h2>
+    <div id="content">
+        <div class="row">
+            <div class="col-sm-6">
+                <table class="font-weight-bold" style="font-size:18px;">
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>:</td>
+                            <td>{{application.name}}</td>
+                        </tr>
+                        <tr>
+                            <td>Age</td>
+                            <td>:</td>
+                            <td>{{application.age}} yrs</td>
+                        </tr>
+                        <tr>
+                            <td>Sex</td>
+                            <td>:</td>
+                            <td>{{application.sex}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-6">
+                <table class="font-weight-bold" style="font-size:18px;">
+                    <tbody>
+                        <tr>
+                            <td>Received_on</td>
+                            <td>:</td>
+                            <td>{{application.recieved_on}}</td>
+                        </tr>
+                        <tr>
+                            <td>Lab_No</td>
+                            <td>:</td>
+                            <td>{{application.lab_no}}</td>
+                        </tr>
+                        <tr>
+                            <td>Ref.By</td>
+                            <td>:</td>
+                            <td>{{application.ref_by}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <table class="table my-3">
+            <thead>
+                <tr>
+                    <th scope="col">Test</th>
+                    <th scope="col">Finding Values</th>
+                    <th scope="col">Ref . Range</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{record.test}}</td>
+                    <td>{{record.finding}}</td>
+                    <td>{{record.ref}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button class="btn btn-primary" onclick="printme()">print</button>
+</div>
+
+{% endblock body %}
+{% block js %}
+<script>
+    function printme(){
+        window.print()
+    }
+</script>
+{% endblock js %}

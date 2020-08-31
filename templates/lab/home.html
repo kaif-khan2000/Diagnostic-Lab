@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block homeactive %} active
+{% endblock homeactive %}
+
+{% block title %}Home
+{% endblock title %}
+
+{% block body %}
+
+<div class="container w-50 my-3">
+  <h2>Shriya Lab Application - {{lab_no}}</h2>
+  <div id="alert">
+  </div>
+  <div class="row my-2">
+    <div class="col">
+      <input type="text" id="name" class="form-control" placeholder="Name">
+    </div>
+
+  </div>
+
+  <div class="row my-2">
+    <div class="col-xs-2 mx-3">
+      <input type="text" id="sex" list="sex2" class="form-control" placeholder="Sex">
+      <datalist id="sex2">
+
+        <option value="Male"></option>
+        <option value="Female"></option>
+      </datalist>
+    </div>
+    <div class="col-xs-2">
+      <input type="text" id="age" class="form-control" placeholder="Age">
+    </div>
+    <div class="col-xs-2 mx-2">
+      <h3>&#8377;<span id="cost">0</span></h3>
+    </div>
+  </div>
+  <div class="row my-2">
+    <div class="col-xs-3 mb-2 mx-3">
+      <input type="text" list="tests" class="form-control test" id="test" placeholder="Tests">
+      <datalist id="tests">
+
+      </datalist>
+    </div>
+    <button onclick="addTest()" class="btn btn-primary mb-2">+</button>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">S.no</th>
+        <th scope="col">Test</th>
+        <th scope="col">Cost</th>
+      </tr>
+    </thead>
+    <tbody id="tableData">
+
+
+    </tbody>
+  </table>
+
+  <button class="btn btn-primary" onclick="submit()"> Submit </button>
+
+</div>
+
+{% endblock body %}
+
+{% block js %}
+
+<script>
+  var price = document.getElementById("cost");
+  var list = [];
+  var deleted = [];
+  var count = 0;
+  var lab_no = '{{lab_no}}'
+  
+  var table = document.getElementById("tableData");
+  $('#test').on('input paste', function (e) {
+    var suggestions = document.getElementById('tests');
+    $.ajax({
+      type: "GET",
+      url: "/test_ajax",
+      data: {
+        "search": $('#test').val(),
+      },
+      success: function (response) {
+        suggestions.innerHTML = ""
+        for (i = 0; i < response.length; i++) {
+          suggestions.innerHTML += "<option><h2>" + response[i].fields.test + "</h2><option>";
+        }
+      }
+
+    });
+
+  });
+
+
+  function addTest() {
+    var value = document.getElementById("test")
+    if (value != "") {
+      $.ajax({
+        type: "GET",
+        url: "/addTest",
+        data: {
+          "test": value.value,
+        },
+        success: function (response) {
+          count++;
+          table.innerHTML += "<tr>" +
+            "<th scope='row'>" + count + "</th>" +
+            "<td>" + response[0].fields.test + "</td>" +
+            "<td id='cost" + count + "'>" + response[0].fields.price + "</td>" +
+            "<td id='del" + count + "'><button class='btn btn-danger' onclick='deleteMe(" + count + ")'>Delete</button></tr>" +
+            "</tr>";
+          price.innerHTML = parseInt(price.innerHTML) + response[0].fields.price
+          list.push(response[0].fields.test)
+          value.value = ""
+        },
+        error: function (err) {
+          if (err.status == 500) {
+            var alert = document.getElementById("alert");
+
+            alert.innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Sorry!</strong>There is nothing like \"' + value.value + '\" in the database.' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+              '  <span aria-hidden="true">&times;</span>' +
+              '</button> </div>';
+          }
+        }
+      });
+    }
+  }
+
+  function deleteMe(x) {
+    var testCost = document.getElementById("cost" + x).innerHTML;
+    price.innerHTML = parseInt(price.innerHTML) - parseInt(testCost)
+    deleted.push(x - 1);
+    document.getElementById("del" + x).innerHTML = "Removed"
+  }
+
+  function submit() {
+    var name = document.getElementById("name").value;
+    var sex = document.getElementById("sex").value;
+    var age = document.getElementById("age").value;
+
+    if (name == "" || age == "" || sex == "") {
+      var alert = document.getElementById("alert");
+
+      alert.innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>Sorry! </strong>One of the box is empty.' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+        '  <span aria-hidden="true">&times;</span>' +
+        '</button> </div>';
+    }
+    else {
+      $.ajax({
+        async:false,
+        type: "GET",
+        url: "/submitApplication",
+        data: {
+          'name': name,
+          'age': parseInt(age),
+          'sex': sex,
+          'cost': parseInt(price.innerHTML),
+        },
+        success: function (reaponse) {
+          var alert = document.getElementById("alert");
+          alert.innerHTML = '<div class="alert alert-success alert-dismissible fade show" role="alert"><strong>Accepted! </strong>Application is accepted.' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '  <span aria-hidden="true">&times;</span>' +
+            '</button> </div>';
+        },
+      });
+
+      for(i=0;i<list.length;i++){
+        if (i in deleted) continue;
+
+        $.ajax({
+          async:false,
+          type:"GET",
+          url:"/submitRecord",
+          data:{
+            'lab_no':parseInt(lab_no),
+            'test': list[i],
+          },
+        });
+      }
+      window.location.href = "/applications/new"
+    }
+  }
+</script>
+
+{% endblock js %}
