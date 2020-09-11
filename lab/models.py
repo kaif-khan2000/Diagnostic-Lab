@@ -15,12 +15,19 @@ class Application(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.lab_no})"
-    
+
+class Profile(models.Model):
+    sno = models.AutoField(primary_key=True)
+    name = models.CharField(max_length = 50,unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Test(models.Model):
     sno = models.AutoField(primary_key=True)
-    test = models.CharField(max_length=50)
+    test = models.CharField(max_length=50,unique=True)
     price = models.IntegerField(default = 0)
-    device = models.CharField(max_length=300)
+    profile = models.ForeignKey(Profile,on_delete=models.CASCADE)    
 
     def __str__(self):
         return self.test + "(Rs."+str(self.price)+")"
@@ -38,5 +45,16 @@ class Record(models.Model):
     test = models.CharField(max_length=70)
     finding = models.CharField(default="",max_length=30)
     ref = models.CharField(default="",max_length=30)
+    note = models.CharField(default="",max_length=100)
+    device = models.CharField(default="",max_length=200)
+    price = models.IntegerField(default = 0)
     def __str__(self):
         return self.test + "(" + str(self.lab_no) +")"
+
+
+class Device(models.Model):
+    sno = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200,unique=True)
+
+class new(models.Model):
+    sno = models.CharField(default=0, max_length=20)

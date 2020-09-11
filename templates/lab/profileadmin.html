@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block adminactive %}active
+{% endblock adminactive %}
+{% block title %}
+Profile Admin
+{% endblock title %}
+{% block body %}
+
+<div class="container my-3">
+    <div class="row my-3">
+        <div class="col-5 my-3">
+            <div class="rounded-top mx-2 border border-primary">
+                <h2 class="bg-primary text-light">Profile <button
+                        class="btn float-right text-light font-weight-bold" onclick="openPanel('profile','profile')"
+                        id="plusprofile">+</button></h2>
+                <div id="Panelprofile" class="mx-2">
+                   
+                </div>
+            </div>
+        </div>
+        {% for profile in profiles %}
+            <div class="col-5 my-3">
+            <div class="rounded-top mx-2 border border-primary">
+                <h2 class="bg-primary text-light">{{profile.name}}<button
+                        class="btn float-right text-light font-weight-bold" onclick="openPanel('{{profile.name}}','{{profile.sno}}')"
+                        id="plus{{profile.sno}}">+</button></h2>
+                <div id="Panel{{profile.sno}}" class="mx-2">
+                    
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block js %}
+<script>
+
+    function openPanel(name,x){
+        var btn = document.getElementById('plus'+x);
+        var panel = document.getElementById('Panel'+x)
+        if(btn.innerHTML == '-'){
+            btn.innerHTML = '+';
+            panel.innerHTML = '';
+        }else{
+            btn.innerHTML = '-';
+            if(x == 'profile'){
+                panel.innerHTML += ' <form action="/addProfile" method="GET">'+
+                   '     <input type="text" name="profile" placeholder="Add Profile">'+
+                   ' </form>'+
+                   '{% for profile in profiles %}'+
+                   ' <hr><h4>{{profile.name}}<button class="btn float-right" onclick="deleteProfile(\'{{profile.name}}\')">delete</a></h4>'+
+                   '{%endfor%}'
+            }else{
+                $.ajax({
+                    type:"GET",
+                    url:"/getTests",
+                    data:{
+                        'name':name,
+                    },
+                    success:function(response){
+                        panel.innerHTML += '<form action="/addTest" method="GET">'+
+                        '<input type="hidden" name="profile" value="'+name+'">'+
+                        '<input type="text" name="test" placeholder="add test '+name+'">'+
+                        '<input type="number" name="price" placeholder="Price" value="0">'+
+                        '<input type="submit" value="add">'+
+                        '</form>';
+
+                        for(i=0;i<response.length;i++){
+                            panel.innerHTML += '<hr><h4>'+response[i].fields.test+'<button class="btn float-right" onclick="deleteTest(\''+response[i].fields.test+'\')">delete</a></h4>';
+                        }
+                    },
+                })
+            }
+        }
+        
+    }
+    function deleteProfile(name){
+        if(confirm("Are you sure! "+name+" will be deleted")){
+           $.ajax({
+               async:false,
+               type:"GET",
+               url:"/deleteProfile",
+                data:{
+                    'name':name,
+            },
+           });
+           location.reload();
+        }
+    }
+    function deleteTest(name){
+        if( confirm('Are you sure! '+name+' test will be deleted.') ){
+            $.ajax({
+                async:false,
+                type:'GET',
+                url:'/deleteTest',
+                data:{
+                    'name':name,
+                }
+            });
+            location.reload();
+        }
+    }
+
+</script>
+{% endblock js %}

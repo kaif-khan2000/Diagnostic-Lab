@@ -5,7 +5,7 @@
 
 {% block body %}
 
-<div class="container w-50 my-3">
+<div class="container w-70 my-3">
     <h2 class="text-center bg-primary text-light">Shriya Diagnostics</h2>
     <div id = "alertme">
 
@@ -54,22 +54,29 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <table class="table my-3">
-        <thead>
-          <tr>
-            <th scope="col">Test</th>
-            <th scope="col">Finding Values</th>
-            <th scope="col">Ref . Range</th>
-          </tr>
-        </thead>
+    </div><hr>
+    <table class="table my-3 table-borderless">
+        
         <tbody>
           {% for record in records %}
             <tr>
-              <td>{{record.test}}</td>
-              <td id="fi{{forloop.counter}}"><input type="text" class="form-control" id="finding{{forloop.counter}}" placeholder="Finding" value='{{record.finding}}'></td>
-              <td id="ri{{forloop.counter}}"><input type="text" class="form-control" id="range{{forloop.counter}}" placeholder="Range" value='{{record.ref}}'></td>
-              <td id='b{{forloop.counter}}'><button class="btn btn-primary" onclick="push('{{forloop.counter}}','{{record.test}}')">Push</button></td>
+              <th>{{record.test}}</th>
+              <td id="fi{{forloop.counter}}"><input type="text" class="form-control" id="finding{{forloop.counter}}" placeholder="Finding*" value='{{record.finding}}'></td>
+              <td id="ri{{forloop.counter}}"><input type="text" class="form-control" id="range{{forloop.counter}}" placeholder="Range*" value='{{record.ref}}'></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="d{{forloop.counter}}">
+                    <input type="text" list="devices" class="form-control" id="device{{forloop.counter}}" placeholder="Device*">
+                    <datalist id="devices">
+                        {%for device in devices%}
+                            <option value="{{device.name}}"></option>
+                        {%endfor%}
+
+                    </datalist>
+                </td>
+                <td id="n{{forloop.counter}}"><input type="text" class="form-control" id="note{{forloop.counter}}" placeholder="Note"></td>
+                <td id='b{{forloop.counter}}'><button class="btn btn-primary" onclick="push('{{forloop.counter}}','{{record.test}}')">Push</button></td>
             </tr>
           {% endfor %}
         </tbody>
@@ -84,7 +91,9 @@
         function push(x,test){
             finding = document.getElementById('finding'+x).value
             range = document.getElementById('range'+x).value
-            if(finding != "" && range != ""){
+            note = document.getElementById('note'+x).value
+            device = document.getElementById('device'+x).value
+            if(finding != "" && range != "" && device!=""){
                 $.ajax({
                     type:'GET',
                     url:'/registerValues',
@@ -93,11 +102,15 @@
                         'test':test,
                         'finding':finding,
                         'ref':range,
+                        'note':note,
+                        'device':device,
                     },
                     success:function(response){
                         document.getElementById('fi'+x).innerHTML = finding
                         document.getElementById('ri'+x).innerHTML = range
                         document.getElementById('b'+x).innerHTML = ""
+                        document.getElementById('d'+x).innerHTML = device
+                        document.getElementById('n'+x).innerHTML = note
                     }
                 });
             }else{

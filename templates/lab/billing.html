@@ -4,24 +4,25 @@
 {% endblock title %}
 {% block css %}
 <style>
-  @media print {
-      body * {
-          visibility:hidden,
-      }
-      
-      #content {
-          visibility:visible,
-      }
-      #noprint {
-        visibility: hidden;
-      }
-      
-  }
-  </style>
+    @media print {
+        body * {
+            visibility: hidden,
+        }
+
+        #content {
+            visibility: visible,
+        }
+
+        #noprint {
+            visibility: hidden;
+        }
+
+    }
+</style>
 {% endblock css %}
 {% block body %}
 
-<div class="container w-70 my-3">
+<div class="container w-50 my-3">
     <h2 class="text-center bg-primary text-light" id="noprint">Shriya Diagnostics</h2>
     <div id="content">
         <div class="row">
@@ -43,7 +44,12 @@
                             <td>:</td>
                             <td>{{application.sex}}</td>
                         </tr>
-
+                        <tr>
+                            <td>Discount</td>
+                            <td>:</td>
+                            <td id="perTd"><input type="text" class="form-control" id="percentage"
+                                    placeholder="percentage"></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -60,37 +66,35 @@
                             <td>:</td>
                             <td>{{application.lab_no}}</td>
                         </tr>
-                        <tr>
+                        <tr >
                             <td>Ref.By</td>
                             <td>:</td>
                             <td>{{application.ref_by}}</td>
                         </tr>
+                        
                     </tbody>
                 </table>
             </div>
         </div>
-        <hr>
-        <table class="table my-3 table-borderless">
+        <table class="table my-3">
             <thead>
                 <tr>
                     <th scope="col">Test</th>
-                    <th scope="col">Finding Values</th>
-                    <th scope="col">Ref . Range</th>
+                    <th scope="col">Price</th>
+
                 </tr>
             </thead>
             <tbody>
                 {% for record in records %}
                 <tr>
-                    <th>{{record.test}}</th>
-                    <td>{{record.finding}}</td>
-                    <td>{{record.ref}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <th>( {{record.device}} )</th>
-                    <th>{{record.note}}</th>
+                    <td>{{record.test}}</td>
+                    <td>{{record.price}}</td>
                 </tr>
                 {% endfor %}
+                <tr class="bg-dark text-light">
+                    <th>Total</th>
+                    <th>&#8377;<span id="total">{{total}}</span></th>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -100,8 +104,26 @@
 {% endblock body %}
 {% block js %}
 <script>
-    function printme(){
+    function printme() {
         window.print()
+    }
+    $('#percentage').keypress(function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            calPercentage();
+        }
+    });
+
+    function calPercentage() {
+        var per = document.getElementById('percentage');
+        var total = document.getElementById('total');
+        var price = parseInt(total.innerHTML);
+        var td = document.getElementById('perTd');
+        price = price
+        var percent = 100 - parseInt(per.value);
+        price = (price / 100.0) * percent;
+        total.innerHTML = price;
+        td.innerHTML = 100 - percent;
     }
 </script>
 {% endblock js %}
