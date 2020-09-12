@@ -23,6 +23,6 @@ urlpatterns = [
     path('addProfile',views.addProfile,name='addProfile'),
     path('deleteProfile',views.deleteProfile,name='deleteProfile'),
     path('getTests',views.getTests,name='getTests'),
-    path('addTest2',views.addTest,name='addTest'),
+    path('addTest2',views.addTest2,name='addTest'),
     path('deleteTest',views.deleteTest,name='deleteTest'),
 ]
