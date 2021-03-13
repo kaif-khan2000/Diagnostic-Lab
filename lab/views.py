@@ -84,7 +84,7 @@ def submitRecord(request):
     if request.method == 'GET':
         lab_no = request.GET.get("lab_no")
         test = request.GET.get("test")
-
+        rangeValue = Test.objects.get(test = test).range1
         if request.is_ajax:
             application = Application.objects.get(lab_no = lab_no)
             price = Test.objects.get(test=test).price
@@ -93,6 +93,7 @@ def submitRecord(request):
                 application = application,
                 test = test,
                 price = price,
+                ref = rangeValue
             )
 
             return HttpResponse()
@@ -103,6 +104,7 @@ def check(request,slug):
         application = Application.objects.get(lab_no = slug)
         records = Record.objects.filter(lab_no = slug)
         devices = Device.objects.all()
+        
         params = {
             'application':application,
             'records':records,
@@ -204,8 +206,9 @@ def addTest2(request):
         test = request.GET.get('test')
         profile_name = request.GET.get('profile')
         price = int(request.GET.get('price'))
+        range1 = request.GET.get('range')
         profile = Profile.objects.get(name=profile_name)
-        Test.objects.create(test = test,price=price,profile=profile)
+        Test.objects.create(test = test,price=price,profile=profile,range1=range1)
         return redirect('/profileadmin')
 
 def deleteTest(request):

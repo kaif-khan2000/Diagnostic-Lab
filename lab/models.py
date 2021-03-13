@@ -27,6 +27,7 @@ class Test(models.Model):
     sno = models.AutoField(primary_key=True)
     test = models.CharField(max_length=50,unique=True)
     price = models.IntegerField(default = 0)
+    range1 = models.CharField(max_length=50,default = "")
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE)    
 
     def __str__(self):
